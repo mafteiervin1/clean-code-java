@@ -1,12 +1,12 @@
 package videostore.horror;
 
-import java.util.*;
-
-import static videostore.horror.Movie.MovieCategories.NEW_RELEASE;
+import java.util.ArrayList;
+import java.util.List;
 
 class Customer {
 	private String name;
 	private List <Rental> rentals = new ArrayList<>();
+
  	public Customer(String name) {
 		this.name = name;
 	}
@@ -19,48 +19,50 @@ class Customer {
 		return name;
 	}
 
-	public String statement() {
-		double totalAmount = 0;
-		int frequentRenterPoints = 0;
-		String result = "Rental Record for " + getName() + "\n";
+	public String buildStatement() {
+		StringBuilder result = buildStatementHeader();
 
-		for (Rental rental : rentals) {
-			double thisAmount = 0;
-			Movie each = rental.getMovie();
-			// determine amounts for each line
-			int rentedDays = rental.getRentedDays();
-			switch (each.getPriceCode()) {
-				case REGULAR:
-					thisAmount += 2;
-					if (rentedDays > 2)
-						thisAmount += (rentedDays - 2) * 1.5;
-					break;
-				case NEW_RELEASE:
-					thisAmount += rentedDays * 3;
-					break;
-				case CHILDREN:
-					thisAmount += 1.5;
-					if (rentedDays > 3)
-						thisAmount += (rentedDays - 3) * 1.5;
-					break;
-			}
-			// add frequent renter points
-			frequentRenterPoints++;
-			// add bonus for a two day new release rental
-			if (each.getPriceCode() != null &&
-				(each.getPriceCode() == NEW_RELEASE)
-				&& rentedDays > 1)
-				frequentRenterPoints++;
-			// show figures line for this rental
-			result += "\t" + each.getTitle() + "\t"
-				+ String.valueOf(thisAmount) + "\n";
-			totalAmount += thisAmount;
-		}
+		result.append(buildStatementBody());
 
-		// add footer lines
-		result += "Amount owed is " + String.valueOf(totalAmount) + "\n";
-		result += "You earned " + String.valueOf(frequentRenterPoints)
-				+ " frequent renter points";
+		result.append(buildStatementFooter(computeTotalRentalPoints(), computeBonusRenterPoints()));
+
+		return result.toString();
+	}
+
+	private StringBuilder buildStatementFooter(double totalRentalPoints, int frequentRenterPoints) {
+		StringBuilder result = new StringBuilder();
+
+		result.append("Amount owed is ").append(totalRentalPoints).append("\n");
+		result.append("You earned ").append(frequentRenterPoints).append(" frequent renter points");
+
 		return result;
+	}
+
+	private StringBuilder buildStatementHeader() {
+		return new StringBuilder("Rental Record for " + getName() + "\n");
+	}
+
+	private StringBuilder buildStatementBody() {
+		StringBuilder result = new StringBuilder();
+		for (Rental rental : rentals) {
+			result.append("\t").append(rental.getMovie().getTitle()).append("\t").append(rental.computeBonusRenterPoints()).append("\n");
+		}
+		return result;
+	}
+
+	private int computeBonusRenterPoints() {
+		int frequentRenterPoints = 0;
+		for (Rental rental : rentals) {
+			frequentRenterPoints += rental.computeNewReleaseBonusPoints();
+		}
+		return frequentRenterPoints;
+	}
+
+	private double computeTotalRentalPoints() {
+		double totalRentalPoints = 0;
+		for (Rental rental : rentals) {
+			totalRentalPoints += rental.computeBonusRenterPoints();
+		}
+		return totalRentalPoints;
 	}
 }

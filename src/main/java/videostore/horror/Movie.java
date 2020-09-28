@@ -3,15 +3,15 @@ package videostore.horror;
 public class Movie {
 
     private String title;
-    private MovieCategories priceCode;
+    private MovieCategories movieCategory;
 
-    public Movie(String title, MovieCategories priceCode) {
+    public Movie(String title, MovieCategories movieCategory) {
         this.title = title;
-        this.priceCode = priceCode;
+        this.movieCategory = movieCategory;
     }
 
-    public MovieCategories getPriceCode() {
-        return priceCode;
+    public MovieCategories getMovieCategory() {
+        return movieCategory;
     }
 
     public String getTitle() {
