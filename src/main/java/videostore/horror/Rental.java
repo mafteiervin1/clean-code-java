@@ -1,12 +1,12 @@
 package videostore.horror;
 
-import java.util.Objects;
-
 import static videostore.horror.Movie.MovieCategories.NEW_RELEASE;
 
 public class Rental {
     private final Movie movie;
     private final Integer rentedDays;
+    private final int NEW_RELEASE_BONUS_POINTS = 2;
+    private final int REGULAR_BONUS_POINTS = 2;
 
     public Rental(Movie movie, Integer rentedDays) {
         this.movie = movie;
@@ -43,13 +43,10 @@ public class Rental {
         return thisAmount;
     }
 
-    public int computeNewReleaseBonusPoints() {
-        int bonusPoints = 1;
-        if (!Objects.isNull(getMovie().getMovieCategory()) &&
-            (getMovie().getMovieCategory() == NEW_RELEASE)
-            && getRentedDays() > 1) {
-            return bonusPoints + 1;
+    public int computeBonusPoints() {
+        if (getMovie().getMovieCategory() == NEW_RELEASE && getRentedDays() > 1) {
+            return NEW_RELEASE_BONUS_POINTS;
         }
-        return bonusPoints;
+        return REGULAR_BONUS_POINTS;
     }
 }

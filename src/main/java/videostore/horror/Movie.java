@@ -6,6 +6,10 @@ public class Movie {
     private MovieCategories movieCategory;
 
     public Movie(String title, MovieCategories movieCategory) {
+        if (movieCategory == null) {
+            throw new IllegalArgumentException("pune movie category, bradare");
+        }
+
         this.title = title;
         this.movieCategory = movieCategory;
     }
