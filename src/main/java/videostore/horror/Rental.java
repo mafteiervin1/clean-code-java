@@ -6,7 +6,7 @@ public class Rental {
     private final Movie movie;
     private final Integer rentedDays;
     private final int NEW_RELEASE_BONUS_POINTS = 2;
-    private final int REGULAR_BONUS_POINTS = 2;
+    private final int REGULAR_BONUS_POINTS = 1;
 
     public Rental(Movie movie, Integer rentedDays) {
         this.movie = movie;
@@ -22,25 +22,31 @@ public class Rental {
     }
 
     public double computeBonusRenterPoints() {
-        double thisAmount = 0;
         switch (getMovie().getMovieCategory()) {
-            case REGULAR:
-                thisAmount += 2;
-                if (getRentedDays() > 2)
-                    thisAmount += (getRentedDays() - 2) * 1.5;
-                break;
-            case NEW_RELEASE:
-                thisAmount += getRentedDays() * 3;
-                break;
-            case CHILDREN:
-                thisAmount += 1.5;
-                if (getRentedDays() > 3)
-                    thisAmount += (getRentedDays() - 3) * 1.5;
-                break;
+            case REGULAR: return computeRegularRenterBonusPoints();
+            case NEW_RELEASE: return computeNewReleaseRenterBonusPoints();
+            case CHILDREN: return computeChildrenRenterBonusPoints();
             default:
                 throw new IllegalStateException("Unexpected value: " + getMovie().getMovieCategory());
         }
-        return thisAmount;
+    }
+
+    private double computeChildrenRenterBonusPoints() {
+        double bonusPoints = 1.5;
+        return getRentedDays() <= 2
+            ? bonusPoints
+            : bonusPoints + (getRentedDays() - 3) * 1.5;
+    }
+
+    private double computeNewReleaseRenterBonusPoints() {
+        return getRentedDays() * 3;
+    }
+
+    private double computeRegularRenterBonusPoints() {
+        double bonusPoints = 2;
+        return getRentedDays() <= 1
+            ? bonusPoints
+            : bonusPoints + (getRentedDays() - 2) * 1.5;
     }
 
     public int computeBonusPoints() {
